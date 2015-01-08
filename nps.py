@@ -28,12 +28,19 @@ def get_unfiltered_messages(number):
 
 def extract_score(msg):
     """
-        Attempts to extract a score of 1-10 from a message. If a vote
+        Attempts to extract a score of 0-10 from a message. If a vote
         cannot be extracted the function returns False and None.
         If a vote is successfully extracted the function returns True
-        and the score as an int between 1-10.
+        and the score as an int between 0-10.
     """
-    return True, 10
+    try:
+        score = int(msg[:2])
+        if score > 10:
+            score = 10
+        return True, score
+    except ValueError:
+        return False, None
+
 
 def filter_scores(msgs):
     """
@@ -47,7 +54,35 @@ def filter_scores(msgs):
             success, score = extract_score(m)
             if success:
                 scores.append(score)
+                break
     return scores
+
+
+def calculate_nps(scores):
+    """
+        Takes in a list of integers from 0-10 and returns the Net Promoter
+        Score based on those scores.
+    """
+    responses_count = len(scores)
+    promoters = scores.count(10) + scores.count(9)
+    detractors = 0
+    for i in range (0, 7):
+        detractors += scores.count(i)
+    proportion_promoters = promoters / (responses_count + 0.0)
+    proportion_detractors = detractors / (responses_count + 0.0)
+    return (proportion_promoters - proportion_detractors) * 100
+
+
+def output_scores(scores):
+    """
+        Takes in a list of integers from 0-10 and outputs results about
+        Net Promoter Score.
+    """
+    nps = calculate_nps(scores)
+    print("%.0f responses received" % len(scores))
+    print("Net Promoter Score: %0.1f" % nps)
+    for i in range(0, 11):
+        print("%.0f responses with the score of %.0f" % (scores.count(i), i))
 
 
 if __name__ == '__main__':
@@ -59,6 +94,5 @@ if __name__ == '__main__':
         number = sys.argv[1]
         unfiltered_msgs = get_unfiltered_messages(number)
         scores = filter_scores(unfiltered_msgs)
-        print scores
-
+        output_scores(scores)
 
