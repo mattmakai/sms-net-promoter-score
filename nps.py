@@ -50,7 +50,7 @@ def filter_scores(msgs):
         Any score ranked as 11 or higher will be converted to 10.
     """
     scores = []
-    for number, msg_array in msgs.iteritems():
+    for msg_array in msgs.values():
         for m in msg_array:
             success, score = extract_score(m)
             if success:
@@ -87,13 +87,14 @@ def output_scores(scores):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("usage: python nps.py [number with inbound SMS NPS scores]")
-        print("example: python nps.py +12025551234")
-    else:
-        client = TwilioRestClient()
-        number = sys.argv[1]
-        unfiltered_msgs = get_unfiltered_messages(number)
-        scores = filter_scores(unfiltered_msgs)
-        output_scores(scores)
-
+    description = "Process a Twilio phone number and event date."
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('phone_number', type=str,
+                        help='Twilio phone number that people send ' + \
+                             'scores to, for example, +12025551234')
+    args = parser.parse_args()
+    client = TwilioRestClient()
+    number = args.phone_number
+    unfiltered_msgs = get_unfiltered_messages(number)
+    scores = filter_scores(unfiltered_msgs)
+    output_scores(scores)
