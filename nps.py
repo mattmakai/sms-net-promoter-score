@@ -80,10 +80,10 @@ def output_scores(scores):
         Net Promoter Score.
     """
     nps = calculate_nps(scores)
-    print("%.0f responses received" % len(scores))
-    print("Net Promoter Score: %0.1f" % nps)
+    print("{} responses received".format(len(scores)))
+    print("Net Promoter Score: {0:.1f}".format(nps))
     for i in range(0, 11):
-        print("%.0f responses with the score of %.0f" % (scores.count(i), i))
+        print("{0} responses with a score of {1}".format(scores.count(i), i))
 
 
 if __name__ == '__main__':
