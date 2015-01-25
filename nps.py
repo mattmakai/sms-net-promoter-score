@@ -1,60 +1,46 @@
 #!/usr/bin/python
 
 import argparse
+import re
 import sys
+import time
+from datetime import datetime
 from twilio.rest import TwilioRestClient
 
 
-def get_unfiltered_messages(number):
+def get_messages(number, event_date):
     """
         Uses the Twilio Python helper library to iterate through all
         messages sent to a single phone number. Saves the results in
         a dict with the inbound phone number as a key and an array of all
         responses from that phone number as the value.
 
-        For example the return value could look something like the following:
-            {'+12025551234': ['10', 'great job!'],
-             '+13035555678': ['5'],
-             '+19735553456': ['abcdefgh']
-            }
+        Keyword arguments:
+            number -- which number to search for messages
+
     """
-    unfiltered_msgs = {}
-    for m in client.messages.iter(to=number):
-        if m.from_ in unfiltered_msgs.keys():
-            unfiltered_msgs[m.from_].append(m.body)
+    msgs = {}
+    for m in client.messages.iter(to=number, date_sent=event_date):
+        if m.from_ in msgs.keys():
+            msgs[m.from_].append(m.body)
         else:
-            unfiltered_msgs[m.from_] = [m.body]
-    return unfiltered_msgs
-
-
-def extract_score(msg):
-    """
-        Attempts to extract a score of 0-10 from a message. If a vote
-        cannot be extracted the function returns False and None.
-        If a vote is successfully extracted the function returns True
-        and the score as an int between 0-10.
-    """
-    try:
-        score = int(msg[:2])
-        if score > 10:
-            score = 10
-        return True, score
-    except ValueError:
-        return False, None
+            msgs[m.from_] = [m.body]
+    return msgs
 
 
 def filter_scores(msgs):
     """
         Converts a dict with phone numbers as keys and inbound messages
-        as arrays for values into an array with just scores from 1-10.
-        Any score ranked as 11 or higher will be converted to 10.
+        as arrays for values into an array with just scores from 0-10,
+        including any scores with decimal places.
     """
     scores = []
     for msg_array in msgs.values():
         for m in msg_array:
-            success, score = extract_score(m)
-            if success:
-                scores.append(score)
+            score = re.match("\d+(\.\d{1,2})?", m)
+            if score:
+                scores.append(round(float(score.group())))
+                # break to prevent counting duplicate scores from same number
                 break
     return scores
 
@@ -64,14 +50,14 @@ def calculate_nps(scores):
         Takes in a list of integers from 0-10 and returns the Net Promoter
         Score based on those scores.
     """
-    responses_count = len(scores)
-    promoters = scores.count(10) + scores.count(9)
-    detractors = 0
-    for i in range (0, 7):
-        detractors += scores.count(i)
-    proportion_promoters = promoters / (responses_count + 0.0)
-    proportion_detractors = detractors / (responses_count + 0.0)
-    return (proportion_promoters - proportion_detractors) * 100
+    detractors, promoters = 0, 0
+    for s in scores:
+        if s <= 6:
+            detractors += 1
+        if s >= 9:
+            promoters += 1
+    return (float(promoters) / len(scores) - \
+            float(detractors) / len(scores)) * 100
 
 
 def output_scores(scores):
@@ -92,9 +78,22 @@ if __name__ == '__main__':
     parser.add_argument('phone_number', type=str,
                         help='Twilio phone number that people send ' + \
                              'scores to, for example, +12025551234')
+    parser.add_argument('--date', dest='event_date', type=str,
+                        default=datetime.today().strftime("%Y-%M-%d"),
+                        help='Date of the event to filter messages on. ' + \
+                             'YYYY-MM-DD format. (default: today)')
     args = parser.parse_args()
-    client = TwilioRestClient()
-    number = args.phone_number
-    unfiltered_msgs = get_unfiltered_messages(number)
-    scores = filter_scores(unfiltered_msgs)
-    output_scores(scores)
+    try:
+        client = TwilioRestClient()
+    except:
+        # input Twilio credentials if not set in environment variables
+        account = "ACXXXXXXXXXXXXXXXXX"
+        token = "YYYYYYYYYYYYYYYYYY"
+        client = TwilioRestClient(account, token)
+    msgs = get_messages(args.phone_number, args.event_date)
+    scores = filter_scores(msgs)
+    if len(scores) > 0:
+        output_scores(scores)
+    else:
+        print("No scores found for an event on {}.".format(args.event_date))
+
