@@ -2,7 +2,6 @@
 
 import argparse
 import re
-import sys
 import time
 from datetime import datetime
 from twilio.rest import TwilioRestClient
@@ -17,6 +16,7 @@ def get_messages(number, event_date):
 
         Keyword arguments:
             number -- which number to search for messages
+            event_date -- string with date in YYYY-MM-DD format
 
     """
     msgs = {}
@@ -33,6 +33,10 @@ def filter_scores(msgs):
         Converts a dict with phone numbers as keys and inbound messages
         as arrays for values into an array with just scores from 0-10,
         including any scores with decimal places.
+
+        Keyword arguments:
+            msgs -- dict with phone numbers as keys and a list of
+                    inbound messages as the values
     """
     scores = []
     for msg_array in msgs.values():
@@ -47,8 +51,11 @@ def filter_scores(msgs):
 
 def calculate_nps(scores):
     """
-        Takes in a list of integers from 0-10 and returns the Net Promoter
-        Score based on those scores.
+        Takes in a list of floats and returns the Net Promoter Score based
+        on those scores.
+
+        Keyword arguments:
+            scores -- list of floats representing scores
     """
     detractors, promoters = 0, 0
     for s in scores:
@@ -64,6 +71,9 @@ def output_scores(scores):
     """
         Takes in a list of integers from 0-10 and outputs results about
         Net Promoter Score.
+
+        Keyword arguments:
+            scores -- list of floats representing scores
     """
     nps = calculate_nps(scores)
     print("{} responses received".format(len(scores)))
@@ -79,7 +89,7 @@ if __name__ == '__main__':
                         help='Twilio phone number that people send ' + \
                              'scores to, for example, +12025551234')
     parser.add_argument('--date', dest='event_date', type=str,
-                        default=datetime.today().strftime("%Y-%M-%d"),
+                        default=datetime.today().strftime("%Y-%m-%d"),
                         help='Date of the event to filter messages on. ' + \
                              'YYYY-MM-DD format. (default: today)')
     args = parser.parse_args()
