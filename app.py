@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, Response
 import twilio.twiml as twiml
 
 app = Flask(__name__)
