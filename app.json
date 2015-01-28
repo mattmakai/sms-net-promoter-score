@@ -20,7 +20,7 @@
         "TWILIO_AUTH_TOKEN": {
             "description": "Your Twilio account's secret key, found here: https://www.twilio.com/user/account",
             "value": "yyyyyyyyyyyyyyyyyy"
-        },
+        }
     },
     "success_url": "/"
 }
