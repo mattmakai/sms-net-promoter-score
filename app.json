@@ -1,5 +1,5 @@
 {
-    "name": "Net Promoter Score SMS Receiver",
+    "name": "NPS SMS Receiver",
     "description": "A Flask app that receives SMS responses from the audience and responds back with a thank you SMS.",
     "keywords": [
         "twilio",
