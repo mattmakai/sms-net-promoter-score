@@ -7,6 +7,11 @@ from datetime import datetime
 from twilio.rest import TwilioRestClient
 
 
+# input Twilio credentials if not set in environment variables
+account = "ACXXXXXXXXXXXXXXXXX"
+token = "YYYYYYYYYYYYYYYYYY"
+
+
 def get_messages(number, event_date):
     """
         Uses the Twilio Python helper library to iterate through all
@@ -96,9 +101,6 @@ if __name__ == '__main__':
     try:
         client = TwilioRestClient()
     except:
-        # input Twilio credentials if not set in environment variables
-        account = "ACXXXXXXXXXXXXXXXXX"
-        token = "YYYYYYYYYYYYYYYYYY"
         client = TwilioRestClient(account, token)
     msgs = get_messages(args.phone_number, args.event_date)
     scores = filter_scores(msgs)
