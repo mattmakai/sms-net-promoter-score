@@ -1,2 +1,5 @@
 Flask==0.10.1
 twilio==3.6.15
+
+# the following requirement is for deploying to Heroku
+gunicorn==19.1.1
