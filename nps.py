@@ -54,6 +54,21 @@ def filter_scores(msgs):
     return scores
 
 
+def output_scores(scores):
+    """
+        Takes in a list of integers from 0-10 and outputs results about
+        Net Promoter Score.
+
+        Args:
+        scores -- list of floats representing scores
+    """
+    nps = calculate_nps(scores)
+    print("{} responses received".format(len(scores)))
+    print("Net Promoter Score: {0:.1f}".format(nps))
+    for i in range(0, 11):
+        print("{0} responses with a score of {1}".format(scores.count(i), i))
+
+
 def calculate_nps(scores):
     """
         Takes in a list of floats and returns the Net Promoter Score based
@@ -70,21 +85,6 @@ def calculate_nps(scores):
             promoters += 1
     return (float(promoters) / len(scores) - \
             float(detractors) / len(scores)) * 100
-
-
-def output_scores(scores):
-    """
-        Takes in a list of integers from 0-10 and outputs results about
-        Net Promoter Score.
-
-        Args:
-        scores -- list of floats representing scores
-    """
-    nps = calculate_nps(scores)
-    print("{} responses received".format(len(scores)))
-    print("Net Promoter Score: {0:.1f}".format(nps))
-    for i in range(0, 11):
-        print("{0} responses with a score of {1}".format(scores.count(i), i))
 
 
 if __name__ == '__main__':
