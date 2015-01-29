@@ -61,7 +61,7 @@ def output_scores(scores):
          scores -- list of floats representing scores
     """
     nps = calculate_nps(scores)
-    print("{} responses received".format(len(scores)))
+    print("{0} responses received".format(len(scores)))
     print("Net Promoter Score: {0:.1f}".format(nps))
     for i in range(0, 11):
         print("{0} responses with a score of {1}".format(scores.count(i), i))
@@ -108,5 +108,5 @@ if __name__ == '__main__':
     if len(scores) > 0:
         output_scores(scores)
     else:
-        print("No scores found for an event on {}.".format(args.event_date))
+        print("No scores found for an event on {0}.".format(args.event_date))
 
