@@ -13,16 +13,14 @@ token = "YYYYYYYYYYYYYYYYYY"
 
 
 def get_messages(number, event_date):
-    """
-        Uses the Twilio Python helper library to iterate through all
-        messages sent to a single phone number. Saves the results in
-        a dict with the inbound phone number as a key and an array of all
-        responses from that phone number as the value.
+    """Uses the Twilio Python helper library to iterate through all
+    messages sent to a single phone number.
 
-        Args:
-        number -- which number to search for messages
-        event_date -- string with date in YYYY-MM-DD format
-
+    Args:
+      number -- which number to search for messages
+      event_date -- string with date in YYYY-MM-DD format
+    Returns:
+      dict -- inbound phone number as key and array of responses as values
     """
     msgs = {}
     for message in client.messages.iter(to=number, date_sent=event_date):
@@ -34,14 +32,15 @@ def get_messages(number, event_date):
 
 
 def filter_scores(msgs):
-    """
-        Converts a dict with phone numbers as keys and inbound messages
-        as arrays for values into an array with just scores from 0-10,
-        including any scores with decimal places.
+    """Converts a dict with phone numbers as keys and inbound messages
+       as arrays for values into an array with just scores from 0-10,
+       including any scores with decimal places.
 
-        Args:
-        msgs -- dict with phone numbers as keys and a list of
-                inbound messages as the values
+       Args:
+         msgs -- dict with phone numbers as keys and a list of
+                  inbound messages as the values
+       Returns:
+         list -- scores as floats from 0-10
     """
     scores = []
     for msg_array in msgs.values():
@@ -55,12 +54,11 @@ def filter_scores(msgs):
 
 
 def output_scores(scores):
-    """
-        Takes in a list of integers from 0-10 and outputs results about
-        Net Promoter Score.
+    """Takes in a list of integers from 0-10 and outputs results about
+       Net Promoter Score.
 
-        Args:
-        scores -- list of floats representing scores
+       Args:
+         scores -- list of floats representing scores
     """
     nps = calculate_nps(scores)
     print("{} responses received".format(len(scores)))
@@ -70,12 +68,13 @@ def output_scores(scores):
 
 
 def calculate_nps(scores):
-    """
-        Takes in a list of floats and returns the Net Promoter Score based
-        on those scores.
+    """Takes in a list of floats and returns the Net Promoter Score based
+       on those scores.
 
-        Args:
-        scores -- list of floats representing scores
+       Args:
+         scores -- list of floats representing scores
+       Returns:
+         float -- Net Promoter Score from -100.0 to +100.0
     """
     detractors, promoters = 0, 0
     for s in scores:
