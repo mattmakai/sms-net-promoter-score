@@ -8,8 +8,8 @@ from twilio.rest import TwilioRestClient
 
 
 # input Twilio credentials if not set in environment variables
-account = "ACXXXXXXXXXXXXXXXXX"
-token = "YYYYYYYYYYYYYYYYYY"
+ACCOUNT = "ACXXXXXXXXXXXXXXXXX"
+TOKEN = "YYYYYYYYYYYYYYYYYY"
 
 
 def get_messages(number, event_date):
@@ -82,8 +82,10 @@ def calculate_nps(scores):
             detractors += 1
         if s >= 9:
             promoters += 1
-    return (float(promoters) / len(scores) - \
-            float(detractors) / len(scores)) * 100
+    # below we calculate the Net Promoter Score with this formula
+    nps = (float(promoters) / len(scores) - \
+           float(detractors) / len(scores)) * 100
+    return nps
 
 
 if __name__ == '__main__':
@@ -100,7 +102,7 @@ if __name__ == '__main__':
     try:
         client = TwilioRestClient()
     except:
-        client = TwilioRestClient(account, token)
+        client = TwilioRestClient(ACCOUNT, TOKEN)
     msgs = get_messages(args.phone_number, args.event_date)
     scores = filter_scores(msgs)
     if len(scores) > 0:
